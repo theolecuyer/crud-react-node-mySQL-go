@@ -1,0 +1,28 @@
+services:
+    frontend:
+        build:
+            context: frontend
+        ports:
+            - "5173:5173"
+    backend:
+        build:
+            context: backend
+        ports:
+            - "8800:8800"
+        depends_on:
+            - mysql
+    mysql:
+        image: mysql:8.0
+        ## Had to use native password to get the old mysql npm package to work with the new authentication
+        ## https://dev.mysql.com/blog-archive/upgrading-to-mysql-8-0-default-authentication-plugin-considerations/
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: "test"
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+            - "3306:3306"
+        volumes:
+            - db-data:/var/lib/mysql
+            - ./mysql:/docker-entrypoint-initdb.d
+volumes:
+    db-data: {}
